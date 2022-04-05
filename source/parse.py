@@ -13,7 +13,7 @@ import wordninja
 from new_reintroduce_spaces import reintroduce_spaces
 
 #course id regex string
-c_id_re_s = r"[A-Z]{2,5}(-|\s+)[0-9]{3,4}[A-Z]{0,1}" 
+c_id_re_s = r"[A-Z]{2,5}(-|\s+)[0-9]{3,4}[A-Z]{0,1}" #Works for all course catalog
 c_id_re = re.compile(c_id_re_s)
 
 def parseXML(filepath, courseTag, descTag, descTagsFromID):
@@ -24,6 +24,7 @@ def parseXML(filepath, courseTag, descTag, descTagsFromID):
     OUT: a Pandas dataframe of the courses
     '''
     # Get xml (tree) into a list (stack) and find courses (courseID & descriptions)
+    #why stack? LIFO
     parser = etree.XMLParser(recover=True)
     tree = ET.parse(filepath, parser=parser)
     text = tree.getroot()
@@ -39,7 +40,7 @@ def parseXML(filepath, courseTag, descTag, descTagsFromID):
     match = re.search('superTrimmedPDFs/',filepath) # < potential for a bug here!!!!!
     filename = filepath[match.end():]
     #Check if the college we are parsing is known to have Course ID's and Descriptions in one <P> tag
-    special_colleges = ['Alma', 'Northwestern','Sagu']
+    special_colleges = ['Alma', 'Northwestern','Sagu'] #tested on other colleges, these have special catalogs?
     for college in special_colleges:
         if re.match(college,filename) is not None:
             extParse = True
@@ -52,25 +53,31 @@ def parseXML(filepath, courseTag, descTag, descTagsFromID):
     #Allows us to keep track of a numeric index in the stack
     counter = 0
     #For each element in the stack:
-    for elm in stack:
-        if elm.text is not None:
-            if counter + descTagsFromID >= len(stack):
+    for elm in stack: #for every line in the xml
+        if elm.text is not None: #when casting each line as text, if it is not empty, move forward
+            if counter + descTagsFromID >= len(stack): #checking if out of bounds
                 oob = True
             if not oob:
+                print("descTagsFromID:", descTagsFromID)
+                print("descTag:", descTag)
+                print("elm.text:", elm.text)
+                print("counter + descTagsFromID:", counter + descTagsFromID)
                 #Check if we match the Course ID pattern at the beginning of the line
                 #Check if we are looking at a <P> tag
                 #Checks if the next element is a <P> tag
                 #Checks that the Course ID is less than 19 words
-                #Checks if the description is longer than 6 words
+                #Checks if the description is longer than 6 words (updated to 19 so that small description where courses are listed are not counted)
                 #Checks that there is only 1 Course ID in the line
                 #Checks that the next <P> tag doesn't start with a Course ID
+                # (line below) looking for the first occurance of the courseID in a line, checking if the p tag is a courseID
                 if re.match(c_id_re, elm.text) is not None and \
                         (elm.tag == courseTag) and \
                         (stack[counter + descTagsFromID].tag) == descTag and \
                         len(re.findall(r'\w+', elm.text)) < 19 and \
-                        len(re.findall(r'\w+', stack[counter + descTagsFromID].text)) > 6 and \
-                        len(re.findall(c_id_re, elm.text)) < 2 and \
-                        re.match("^.{0,10}([A-Z]{2,5}(-|\s+)[0-9]{3,4}[A-Z]{0,1})", stack[counter + descTagsFromID].text) is None:
+                        len(re.findall(r'\w+', stack[counter + descTagsFromID].text)) > 19 and \
+                        len(re.findall(c_id_re, elm.text)) < 2:
+                        #re.match("^.{0,10}([A-Z]{2,5}(-|\s+)[0-9]{3,4}[A-Z]{0,1})", stack[counter + descTagsFromID].text) is None:
+                        #removed ^ because listing situation is already prevented by checking line length earlier on
                     #Sets the description to the <P> tag after the identified Course ID
                     description = stack[counter + descTagsFromID].text
                     #Check to see if the description is split into multiple <P> tags
@@ -95,7 +102,7 @@ def parseXML(filepath, courseTag, descTag, descTagsFromID):
                     #Get rid of extra white space at the beginning of the description
                     description = re.sub('^\s+', '', description)
                     #Append Course ID and Description to their respective lists
-                    courseID.append(elm.text)                    
+                    courseID.append(elm.text)
                     descriptions.append(description)
                 #This checks for Course ID and Description in one <P>
                 #Checks if it starts with a Course ID
