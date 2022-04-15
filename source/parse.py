@@ -58,10 +58,10 @@ def parseXML(filepath, courseTag, descTag, descTagsFromID):
             if counter + descTagsFromID >= len(stack): #checking if out of bounds
                 oob = True
             if not oob:
-                print("descTagsFromID:", descTagsFromID)
-                print("descTag:", descTag)
-                print("elm.text:", elm.text)
-                print("counter + descTagsFromID:", counter + descTagsFromID)
+                #print("descTagsFromID:", descTagsFromID)
+                #print("descTag:", descTag)
+                #print("elm.text:", elm.text)
+                #print("counter + descTagsFromID:", counter + descTagsFromID)
                 #Check if we match the Course ID pattern at the beginning of the line
                 #Check if we are looking at a <P> tag
                 #Checks if the next element is a <P> tag
@@ -143,6 +143,15 @@ def createStack(element, stack):
 
 
 def makeCSV(filename, superTrimmedDir):
+    # keep a pointer to the non-space-corrected file
+    deletable = filename
+
+        # reintroduce spaces and reassign `filename` to cleaned file
+    filename = reintroduce_spaces(superTrimmedDir + "/" + filename)
+    filename = filename[filename.rfind("/") + 1:]  # chop off the directory path, only leave name filename
+
+        # remove non-space-corrected file
+    os.unlink(superTrimmedDir + "/" + deletable)
     """
     Applies space correction if needed and calls parseXML (for extracting courses descriptions and titles out of XML)
 
@@ -151,7 +160,7 @@ def makeCSV(filename, superTrimmedDir):
     """
 
     #Checks if we are looking at a college we know needs WordNinja
-    badspacing_colleges = ['Brown', '2011Cornell', 'Carlow', 'Caldwell', 'Denison', 'Pittsburgh', 'Youngstown']
+    """ badspacing_colleges = ['Brown', '2011Cornell', 'Carlow', 'Caldwell', 'Denison', 'Pittsburgh', 'Youngstown']
 
     for college in badspacing_colleges:
         if re.match(college, filename) is not None:
@@ -161,16 +170,7 @@ def makeCSV(filename, superTrimmedDir):
             needsWN = False
 
     #Checks if the college needs Word Ninja
-    if needsWN:
-        # keep a pointer to the non-space-corrected file
-        deletable = filename
-
-        # reintroduce spaces and reassign `filename` to cleaned file
-        filename = reintroduce_spaces(superTrimmedDir + "/" + filename)
-        filename = filename[filename.rfind("/") + 1:]  # chop off the directory path, only leave name filename
-
-        # remove non-space-corrected file
-        os.unlink(superTrimmedDir + "/" + deletable)
+    if needsWN: """
 
     # use parseXML to find course headers and descriptions
     CSV = parseXML(superTrimmedDir+ "/" + filename, 'P', 'P', 1)
