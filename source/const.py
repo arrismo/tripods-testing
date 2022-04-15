@@ -11,4 +11,4 @@ SUPERTRIMMED_DIR = "../temp_data/superTrimmedPDFs"
 CSV_DIR = "../courses" # work on implementing this variable throughout the code
 TRIM_CSV = "../Catalogs.csv"
 DATE = date.today() # can be useful if we want to date outputs
-ALL_CSV = "smithsample.csv"
+ALL_CSV = "noline.csv"

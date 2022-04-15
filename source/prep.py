@@ -76,28 +76,30 @@ def trimFile(in_path, out_path, filename, line_num_dict):
 
     # if xml file
     if filename.endswith(".xml"):
+       
+        # # if information about at which lines to trim file, assign line numbers to `start` and `end`
+        # if filename[:filename.rfind(".")].lower() in line_num_dict:
+        #     start, end = line_num_dict[filename[:filename.rfind(".")].lower()]
 
-        # if information about at which lines to trim file, assign line numbers to `start` and `end`
-        if filename[:filename.rfind(".")].lower() in line_num_dict:
-            start, end = line_num_dict[filename[:filename.rfind(".")].lower()]
-
-        new_file_lines = []
+        # new_file_lines = []
 
         with open(in_path + "/" + filename, "r") as f:
             lines = f.readlines()
 
-            # if found information about line numbers, use it to trim out the lines
-            if filename[:filename.rfind(".")].lower() in line_num_dict:
-                new_file_lines = lines[start - 1:end]
-            # otherwise just save the whole file
-            else:
-                new_file_lines = lines
-
+        #     # if found information about line numbers, use it to trim out the lines
+        #     if filename[:filename.rfind(".")].lower() in line_num_dict:
+        #         new_file_lines = lines[start - 1:end]
+        #     # otherwise just save the whole file
+        #     else:
+        #         new_file_lines = lines
+        new_file_lines = lines
         new_filename = filename[:filename.rfind(".")] + "TRIMMED" + filename[filename.rfind("."):]
         with open(out_path + "/" + new_filename, "w") as f:
             f.writelines(new_file_lines)
 
 
+
+    
 def cleanXML(in_path, out_path, filename):
     """
     Removes unnecessary tags, as well as the contents of Figure tags.

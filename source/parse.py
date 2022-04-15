@@ -58,10 +58,10 @@ def parseXML(filepath, courseTag, descTag, descTagsFromID):
             if counter + descTagsFromID >= len(stack): #checking if out of bounds
                 oob = True
             if not oob:
-                print("descTagsFromID:", descTagsFromID)
-                print("descTag:", descTag)
-                print("elm.text:", elm.text)
-                print("counter + descTagsFromID:", counter + descTagsFromID)
+                # print("descTagsFromID:", descTagsFromID)
+                # print("descTag:", descTag)
+                # print("elm.text:", elm.text)
+                # print("counter + descTagsFromID:", counter + descTagsFromID)
                 #Check if we match the Course ID pattern at the beginning of the line
                 #Check if we are looking at a <P> tag
                 #Checks if the next element is a <P> tag
