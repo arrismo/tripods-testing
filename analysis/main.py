@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import nltk
 import spacy
+import courseToBOK
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
@@ -26,6 +27,7 @@ from process_words_funct import process_words
 from tfidf_analysis import tfidf
 from tokenizer import tokenize
 
+
 nlp = spacy.load('en_core_web_sm')
 
 ##Import CSV as Dataframes
@@ -33,10 +35,12 @@ schools_df = pd.read_csv("Smith-07-10-2020-FROZEN.csv")
 del(schools_df['Unnamed: 0'])
 
 
-text_file = open("blank4.txt", "r")
+text_file = open("bok.txt", "r")
 bok = text_file.read().split('\n')
+bok = courseToBOK.cleanBOK(bok)
 for i in range(len(bok)): #lowercase each bok term
   bok[i] = bok[i].lower()
+
 
 
 #retain only courses pertinent to Data Science
@@ -193,7 +197,7 @@ while i >=0:
 
 #stop words definition
 stop_words = list(stopwords.words('english'))
-nlp = spacy.load('en', disable=['parser', 'ner'])
+nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
 stop_words.append('-PRON-')
 first_stops = ['cr','ul','ii','cog','pp','ps','geog','cosc','biol','el','sesp',
                'eecs','oba','phys','phy','mth','cmsc','nur','ce','cs','iii'] #unkown/unnecessary abbreviations
@@ -210,7 +214,7 @@ fourth_stops = ['treat','prereq','prerequisite','creditsprerequisite',
                 'andor','semester','hoursprereq','student','instructor','threehour',
                 'within','lecturescover','satisfactoryno','summer','yifat',
                 'givenfor','term','classroom','area','inquiry','researchintensive',
-                'year','via','teacher','ofhow'] #other unuseful words
+                'year','via','teacher','ofhow', 'specialstudies', 'research', 'special', 'studies'] #other unuseful words
 stop_words.extend(first_stops)
 stop_words.extend(second_stops)
 stop_words.extend(third_stops)
@@ -229,7 +233,7 @@ for i in range(len(ds_schools_df)): # for each row
 #create weights
 ds_schools_df["Weights"] = 0
 for i in range(len(ds_schools_df)): #for each row
-  print(i)
+  #print(i)
   num = 0
   d = ds_schools_df['Descriptions'][i]
   d = d.split() #split for word count
